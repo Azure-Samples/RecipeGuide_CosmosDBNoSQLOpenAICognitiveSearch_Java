@@ -2,15 +2,17 @@ package com.azure.cosmos;
 
 import com.azure.ai.openai.OpenAIClient;
 import com.azure.ai.openai.OpenAIClientBuilder;
-import com.azure.ai.openai.models.NonAzureOpenAIKeyCredential;
+import com.azure.ai.openai.models.*;
 import com.azure.core.credential.AzureKeyCredential;
 import com.azure.core.http.policy.ExponentialBackoffOptions;
 import com.azure.core.http.policy.RetryOptions;
-import com.azure.core.util.ClientOptions;
+import lombok.extern.slf4j.Slf4j;
 
 import java.time.Duration;
 import java.time.temporal.ChronoUnit;
+import java.util.List;
 
+@Slf4j
 public class OpenAIService {
     private String openAIEmbeddingDeployment;
     private String openAICompletionDeployment;
@@ -60,5 +62,41 @@ public class OpenAIService {
                     )
                     .buildClient();
         }
+    }
+
+    public List<Double> getEmbeddings(String query) {
+        try {
+            EmbeddingsOptions options = new EmbeddingsOptions(List.of(query));
+
+            var response = openAIClient.getEmbeddings(openAIEmbeddingDeployment, options);
+
+            List<EmbeddingItem> embeddings = response.getData();
+
+            return embeddings.get(0).getEmbedding().stream().toList();
+        } catch (Exception ex) {
+            log.error("GetEmbeddingsAsync Exception:", ex);
+            return null;
+        }
+    }
+
+    public String getChatCompletionAsync(String userPrompt, String documents) {
+
+
+        ChatMessage systemMessage = new ChatMessage(ChatRole.SYSTEM, systemPromptRecipeAssistant + documents);
+        ChatMessage userMessage = new ChatMessage(ChatRole.USER, userPrompt);
+
+
+        ChatCompletionsOptions options = new ChatCompletionsOptions(List.of(systemMessage, userMessage));
+        options.setMaxTokens(openAIMaxTokens);
+        options.setTemperature(0.5);
+        options.setFrequencyPenalty(0d);
+        options.setPresencePenalty(0d);
+//            options.setNucleusSamplingFactor(0d);// TODO
+
+
+        ChatCompletions completions = openAIClient.getChatCompletions(openAICompletionDeployment, options);
+
+        return completions.getChoices().get(0).getMessage().getContent();
+
     }
 }

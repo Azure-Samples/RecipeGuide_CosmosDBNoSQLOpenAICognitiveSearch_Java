@@ -1,13 +1,14 @@
 package com.azure.cosmos;
 
-import com.azure.cosmos.models.CosmosQueryRequestOptions;
-import com.azure.cosmos.models.SqlParameter;
-import com.azure.cosmos.models.SqlQuerySpec;
-import com.azure.cosmos.util.CosmosPagedFlux;
+import com.azure.cosmos.models.*;
 import com.azure.cosmos.util.CosmosPagedIterable;
+import lombok.extern.slf4j.Slf4j;
 
 import java.util.List;
+import java.util.Map;
+import java.util.stream.Collectors;
 
+@Slf4j
 public class CosmosDbService {
 
     CosmosContainer container;
@@ -31,6 +32,52 @@ public class CosmosDbService {
         CosmosQueryRequestOptions options = new CosmosQueryRequestOptions();
         CosmosPagedIterable<Integer> results = container.queryItems(query, options, Integer.class);
         return results.iterator().next();
+    }
+
+    public void uploadRecipes(List<Recipe> recipes) {
+        List<CosmosItemOperation> itemOperations = recipes
+                .stream()
+                .map(recipe -> CosmosBulkOperations
+                        .getCreateItemOperation(recipe,
+                                new PartitionKey(recipe.getId()))
+                ).collect(Collectors.toList());
+
+        container.executeBulkOperations(itemOperations);
+    }
+
+    public List<Recipe> getRecipes(List<String> ids) {
+        String join = String.join(",", ids);
+        String querystring = "SELECT * FROM c WHERE c.id IN(" + join + ")";
+
+        log.info(querystring);
+
+        SqlQuerySpec query = new SqlQuerySpec(querystring);
+
+        CosmosPagedIterable<Recipe> recipes = container.queryItems(query, new CosmosQueryRequestOptions(), Recipe.class);
+        return recipes.stream().collect(Collectors.toList());
+    }
+
+    public List<Recipe> getRecipesToVectorize() {
+        SqlQuerySpec query = new SqlQuerySpec("SELECT * FROM c WHERE IS_ARRAY(c.embedding)=false");
+
+        CosmosPagedIterable<Recipe> pagedIterable = container.queryItems(query, new CosmosQueryRequestOptions(), Recipe.class);
+        return pagedIterable.stream().collect(Collectors.toList());
+    }
+
+
+    public void updateRecipesAsync(Map<String, List<Double>> dictInput) {
+        List<CosmosItemOperation> itemOperations = dictInput
+                .entrySet()
+                .stream()
+                .map(s -> {
+                    return CosmosBulkOperations.getPatchItemOperation(s.getKey(),
+                            new PartitionKey(s.getKey()),
+                            CosmosPatchOperations.create()
+                                    .add("/embedding", s.getValue())
+                    );
+                })
+                .collect(Collectors.toList());
+        container.executeBulkOperations(itemOperations);
     }
 
 }
