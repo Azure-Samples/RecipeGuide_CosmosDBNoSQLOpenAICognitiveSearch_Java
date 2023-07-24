@@ -23,6 +23,8 @@ public class Main {
 
         AppConfig config = readAppConfig();
 
+        CosmosDbService cosmosDbService = initCosmosDbService(config);
+
         while (true) {
             int selectedOption = Integer.parseInt(scanner.nextLine());
             switch (selectedOption) {
@@ -40,6 +42,29 @@ public class Main {
             }
 
         }
+    }
+
+    private static CosmosDbService initCosmosDbService(AppConfig config) {
+        CosmosDbService cosmosDbService = new CosmosDbService(config.getCosmosUri(),
+                config.getCosmosKey(),
+                config.getCosmosDatabase(),
+                config.getCosmosContainer()
+        );
+        int recipeWithEmbedding = cosmosDbService.getRecipeCount(true);
+        int recipeWithNoEmbedding = cosmosDbService.getRecipeCount(false);
+
+        System.out.printf("We have %d vectorized recipe(s) and %d non vectorized recipe(s).",
+                recipeWithEmbedding, recipeWithNoEmbedding);
+
+        return cosmosDbService;
+    }
+
+    private static OpenAIService initOpenAIService(AppConfig config) {
+        return new OpenAIService(config.getOpenAIEndpoint(),
+                config.getOpenAIKey(),
+                config.getOpenAIEmbeddingDeployment(),
+                config.getOpenAICompletionsDeployment(),
+                config.getOpenAIMaxToken());
     }
 
     public static void uploadRecipes(AppConfig config) {
