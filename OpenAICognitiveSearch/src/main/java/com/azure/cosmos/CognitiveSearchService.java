@@ -2,7 +2,6 @@ package com.azure.cosmos;
 
 import com.azure.core.credential.AzureKeyCredential;
 import com.azure.core.util.Context;
-import com.azure.cosmos.implementation.directconnectivity.Uri;
 import com.azure.search.documents.SearchClient;
 import com.azure.search.documents.indexes.SearchIndexClient;
 import com.azure.search.documents.indexes.SearchIndexClientBuilder;
@@ -12,7 +11,6 @@ import com.azure.search.documents.models.SearchQueryVector;
 import com.azure.search.documents.util.SearchPagedIterable;
 import lombok.extern.slf4j.Slf4j;
 
-import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
 

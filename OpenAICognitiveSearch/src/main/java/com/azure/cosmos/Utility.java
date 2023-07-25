@@ -1,7 +1,6 @@
 package com.azure.cosmos;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import org.objectweb.asm.TypeReference;
 
 import java.io.File;
 import java.io.IOException;
