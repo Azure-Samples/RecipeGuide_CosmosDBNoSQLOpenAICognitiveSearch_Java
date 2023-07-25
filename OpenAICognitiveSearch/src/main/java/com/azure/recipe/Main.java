@@ -30,17 +30,12 @@ public class Main {
         while (true) {
             int selectedOption = Integer.parseInt(scanner.nextLine());
             switch (selectedOption) {
-                case 1:
-                    uploadRecipes(config);
-                    break;
-                case 2:
-                    generateEmbeddings(config);
-                    break;
-                case 3:
-                    performSearch(config, scanner);
-                    break;
-                default:
+                case 1 -> uploadRecipes(config);
+                case 2 -> generateEmbeddings(config);
+                case 3 -> performSearch(config, scanner);
+                default -> {
                     return;
+                }
             }
 
         }

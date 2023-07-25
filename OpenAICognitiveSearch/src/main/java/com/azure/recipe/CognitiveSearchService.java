@@ -79,13 +79,16 @@ public class CognitiveSearchService {
     }
 
     void uploadAndIndexDocuments(List<Recipe> Recipes) {
-        searchClient.indexDocuments(new IndexDocumentsBatch().addUploadActions(convertRecipeToCogSarchDoc(Recipes)));
+        List<CogSearchDoc> documents = convertRecipeToCogSarchDoc(Recipes);
+        searchClient.indexDocuments(new IndexDocumentsBatch().addUploadActions(documents));
 
     }
 
     public void uploadandIndexDocuments(List<Recipe> Recipes) {
-        searchClient.indexDocuments(new IndexDocumentsBatch().addUploadActions(convertRecipeToCogSarchDoc(Recipes)));
+        IndexDocumentsBatch batch = new IndexDocumentsBatch()
+                .addUploadActions(convertRecipeToCogSarchDoc(Recipes));
 
+        searchClient.indexDocuments(batch);
     }
 
     private List<CogSearchDoc> convertRecipeToCogSarchDoc(List<Recipe> recipes) {

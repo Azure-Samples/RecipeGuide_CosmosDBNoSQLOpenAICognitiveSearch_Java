@@ -1,19 +1,11 @@
 package com.azure.recipe;
 
 import com.azure.cosmos.*;
-import com.azure.cosmos.models.CosmosBulkOperations;
-import com.azure.cosmos.models.CosmosItemOperation;
-import com.azure.cosmos.models.CosmosPatchOperations;
-import com.azure.cosmos.models.CosmosQueryRequestOptions;
-import com.azure.cosmos.models.PartitionKey;
-import com.azure.cosmos.models.SqlParameter;
-import com.azure.cosmos.models.SqlQuerySpec;
+import com.azure.cosmos.models.*;
 import com.azure.cosmos.util.CosmosPagedIterable;
 import lombok.extern.slf4j.Slf4j;
 
-import java.util.Iterator;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 import java.util.stream.Collectors;
 
 @Slf4j
@@ -53,12 +45,19 @@ public class CosmosDbService {
     public void uploadRecipes(List<Recipe> recipes) {
         List<CosmosItemOperation> itemOperations = recipes
                 .stream()
-                .map(recipe -> CosmosBulkOperations
-                        .getCreateItemOperation(recipe,
-                                new PartitionKey(recipe.getId()))
+                .map(recipe -> {
+                            String id = recipe.getId();
+                            if (Objects.isNull(id)) {
+                                recipe.setId(UUID.randomUUID().toString());
+                            }
+                            return CosmosBulkOperations
+                                    .getCreateItemOperation(recipe,
+                                            new PartitionKey(recipe.getId()));
+                        }
                 ).collect(Collectors.toList());
 
-        container.executeBulkOperations(itemOperations);
+        Iterable<CosmosBulkOperationResponse<Object>> cosmosBulkOperationResponses = container.executeBulkOperations(itemOperations);
+        cosmosBulkOperationResponses.forEach(objectCosmosBulkOperationResponse -> log.info("Inserted {}", objectCosmosBulkOperationResponse));
     }
 
     public List<Recipe> getRecipes(List<String> ids) {
