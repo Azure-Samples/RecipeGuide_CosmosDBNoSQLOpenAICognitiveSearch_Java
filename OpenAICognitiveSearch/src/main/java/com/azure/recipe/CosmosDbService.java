@@ -1,5 +1,6 @@
-package com.azure.cosmos;
+package com.azure.recipe;
 
+import com.azure.cosmos.*;
 import com.azure.cosmos.models.CosmosBulkOperations;
 import com.azure.cosmos.models.CosmosItemOperation;
 import com.azure.cosmos.models.CosmosPatchOperations;
@@ -10,6 +11,7 @@ import com.azure.cosmos.models.SqlQuerySpec;
 import com.azure.cosmos.util.CosmosPagedIterable;
 import lombok.extern.slf4j.Slf4j;
 
+import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
@@ -24,6 +26,8 @@ public class CosmosDbService {
         CosmosClient cosmosClient = new CosmosClientBuilder()
                 .endpoint(endpoint)
                 .key(key)
+                .consistencyLevel(ConsistencyLevel.EVENTUAL)
+                .contentResponseOnWriteEnabled(true)
                 .buildClient();
 
         CosmosDatabase database = cosmosClient.getDatabase(databaseName);
@@ -37,7 +41,13 @@ public class CosmosDbService {
 
         CosmosQueryRequestOptions options = new CosmosQueryRequestOptions();
         CosmosPagedIterable<Integer> results = container.queryItems(query, options, Integer.class);
-        return results.iterator().next();
+        Iterator<Integer> iterator = results.iterator();
+        if (iterator.hasNext()) {
+            return iterator.next();
+        } else {
+            return 0;
+        }
+
     }
 
     public void uploadRecipes(List<Recipe> recipes) {

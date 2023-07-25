@@ -1,4 +1,4 @@
-package com.azure.cosmos;
+package com.azure.recipe;
 
 import lombok.Data;
 

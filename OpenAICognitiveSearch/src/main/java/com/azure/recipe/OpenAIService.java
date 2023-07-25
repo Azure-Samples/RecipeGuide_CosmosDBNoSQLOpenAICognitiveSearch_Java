@@ -1,4 +1,4 @@
-package com.azure.cosmos;
+package com.azure.recipe;
 
 import com.azure.ai.openai.OpenAIClient;
 import com.azure.ai.openai.OpenAIClientBuilder;

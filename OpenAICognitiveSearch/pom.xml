@@ -46,7 +46,7 @@
                 <artifactId>exec-maven-plugin</artifactId>
                 <version>3.0.0</version>
                 <configuration>
-                    <mainClass>com.azure.cosmos.Main</mainClass>
+                    <mainClass>com.azure.recipe.Main</mainClass>
                 </configuration>
             </plugin>
             <plugin>

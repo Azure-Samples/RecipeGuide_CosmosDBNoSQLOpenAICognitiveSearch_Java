@@ -1,4 +1,4 @@
-package com.azure.cosmos;
+package com.azure.recipe;
 
 import com.azure.core.credential.AzureKeyCredential;
 import com.azure.core.util.Context;
