@@ -11,6 +11,7 @@ import lombok.extern.slf4j.Slf4j;
 
 import java.time.Duration;
 import java.time.temporal.ChronoUnit;
+import java.util.HashMap;
 import java.util.List;
 
 @Slf4j
@@ -88,15 +89,20 @@ public class OpenAIService {
     public String getChatCompletionAsync(String userPrompt, String documents) {
 
 
-        ChatMessage systemMessage = new ChatMessage(ChatRole.SYSTEM, systemPromptRecipeAssistant + documents);
-        ChatMessage userMessage = new ChatMessage(ChatRole.USER, userPrompt);
+        ChatMessage systemMessage = new ChatMessage(ChatRole.SYSTEM);
+        systemMessage.setContent(systemPromptRecipeAssistant + documents);
+        ChatMessage userMessage = new ChatMessage(ChatRole.USER);
+        userMessage.setContent(userPrompt);
 
 
-        ChatCompletionsOptions options = new ChatCompletionsOptions(List.of(systemMessage, userMessage));
+        ChatCompletionsOptions options = new ChatCompletionsOptions(List.of(userMessage, systemMessage));
         options.setMaxTokens(openAIMaxTokens);
         options.setTemperature(0.5);
         options.setFrequencyPenalty(0d);
         options.setPresencePenalty(0d);
+        options.setN(1);
+        options.setLogitBias(new HashMap<>());
+        options.setUser("");
 //            options.setNucleusSamplingFactor(0d);// TODO
 
 
