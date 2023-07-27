@@ -11,7 +11,7 @@ public class AppConfig {
     private String openAIKey;
     private String openAIEmbeddingDeployment;
     private String openAICompletionsDeployment;
-    private String openAIMaxToken;
+    private int openAIMaxToken;
     private String searchServiceEndPoint;
     private String searchIndexName;
     private String searchServiceAdminApiKey;
@@ -97,11 +97,11 @@ public class AppConfig {
         this.openAICompletionsDeployment = openAICompletionsDeployment;
     }
 
-    public String getOpenAIMaxToken() {
+    public int getOpenAIMaxToken() {
         return openAIMaxToken;
     }
 
-    public void setOpenAIMaxToken(String openAIMaxToken) {
+    public void setOpenAIMaxToken(int openAIMaxToken) {
         this.openAIMaxToken = openAIMaxToken;
     }
 

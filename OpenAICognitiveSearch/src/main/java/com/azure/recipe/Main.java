@@ -105,10 +105,11 @@ public class Main {
         var embeddingVector = openAIEmbeddingService.getEmbeddings(userQuery);
 
         log.info("Performing Vector Search..");
-        var ids = cogSearchService.singleVectorSearch(embeddingVector.stream().map(aDouble -> {
-            Float f = (float) aDouble.doubleValue();
-            return f;
-        }).collect(Collectors.toList()));
+        List<Float> embeddings = embeddingVector.stream().map(aDouble -> {
+            return (Float) (float) aDouble.doubleValue();
+        }).collect(Collectors.toList());
+
+        var ids = cogSearchService.singleVectorSearch(embeddings);
 
         log.info("Retriving recipe(s) from Cosmos DB (RAG pattern)..");
         var retrivedDocs = cosmosDbService.getRecipes(ids);
@@ -119,7 +120,7 @@ public class Main {
 
         for (Recipe recipe : retrivedDocs) {
             recipe.embedding = null; //removing embedding to reduce tokens during chat completion
-            retrivedReceipeNames.append(", " + recipe.name); //to dispay recipes submitted for Completion
+            retrivedReceipeNames.append(", ").append(recipe.name); //to dispay recipes submitted for Completion
         }
 
         log.info("Processing '{}' to generate Completion using OpenAI Service..", retrivedReceipeNames);

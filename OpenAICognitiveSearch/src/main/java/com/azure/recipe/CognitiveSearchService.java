@@ -12,6 +12,7 @@ import com.azure.search.documents.util.SearchPagedIterable;
 import lombok.extern.slf4j.Slf4j;
 
 import java.util.List;
+import java.util.Map;
 import java.util.stream.Collectors;
 
 @Slf4j
@@ -68,7 +69,7 @@ public class CognitiveSearchService {
 
         return response
                 .stream()
-                .map(result -> "result") // TODO
+                .map(result -> (String)result.getDocument(Map.class).get("id")) // TODO
                 .collect(Collectors.toList());
     }
 
@@ -145,9 +146,11 @@ public class CognitiveSearchService {
         SearchField nameSearchField = new SearchField("name", SearchFieldDataType.STRING);
         nameSearchField.setFilterable(true);
         nameSearchField.setSortable(true);
+        nameSearchField.setSearchable(true);;
 
         SearchField descSearchField = new SearchField("description", SearchFieldDataType.STRING);
         descSearchField.setFilterable(true);
+        descSearchField.setSearchable(true);
 
         SearchField embedingSearchField = new SearchField("embedding", SearchFieldDataType.collection(SearchFieldDataType.SINGLE));
         embedingSearchField.setSearchable(true);

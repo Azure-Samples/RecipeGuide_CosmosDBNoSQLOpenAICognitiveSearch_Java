@@ -1,5 +1,6 @@
 package com.azure.recipe;
 
+import com.azure.ai.openai.OpenAIAsyncClient;
 import com.azure.ai.openai.OpenAIClient;
 import com.azure.ai.openai.OpenAIClientBuilder;
 import com.azure.ai.openai.models.*;
@@ -18,7 +19,7 @@ public class OpenAIService {
     private String openAICompletionDeployment;
     private int openAIMaxTokens;
 
-    private OpenAIClient openAIClient;
+    private OpenAIAsyncClient openAIClient;
     private String systemPromptRecipeAssistant = """
             You are an intelligent assistant for Contoso Recipes. 
             You are designed to provide helpful answers to user questions about using
@@ -32,14 +33,17 @@ public class OpenAIService {
             - List the Name of the Recipe at the start of your response folowed by step by step cooking instructions
             - Assume the user is not an expert in cooking.
             - Format the content so that it can be printed to the Command Line 
-            - In case there are more than one recipes you find let the user pick the most appropiate recipe.""";
+            - In case there are more than one recipes you find let the user pick the most appropiate recipe. """;
 
 
     public OpenAIService(String endpoint,
                          String key,
                          String embeddingsDeployment,
-                         String CompletionDeployment,
-                         String maxTokens) {
+                         String completionDeployment,
+                         int maxTokens) {
+        this.openAIEmbeddingDeployment = embeddingsDeployment;
+        this.openAICompletionDeployment = completionDeployment;
+        this.openAIMaxTokens = maxTokens;
 
         RetryOptions retryOptions = new RetryOptions(
                 new ExponentialBackoffOptions()
@@ -47,34 +51,36 @@ public class OpenAIService {
                         .setMaxDelay(Duration.of(2, ChronoUnit.SECONDS))
         );
 
-        if (endpoint.contains("api.openai.com")) {
+        if (endpoint.contains("openai.azure.com")) {
             this.openAIClient = new OpenAIClientBuilder()
                     .endpoint(endpoint)
                     .credential(new AzureKeyCredential(key))
                     .retryOptions(retryOptions
                     )
-                    .buildClient();
+                    .buildAsyncClient();
         } else {
             this.openAIClient = new OpenAIClientBuilder()
                     .endpoint(endpoint)
                     .credential(new NonAzureOpenAIKeyCredential(key))
                     .retryOptions(retryOptions
                     )
-                    .buildClient();
+                    .buildAsyncClient();
         }
     }
 
     public List<Double> getEmbeddings(String query) {
         try {
             EmbeddingsOptions options = new EmbeddingsOptions(List.of(query));
+            options.setUser("");
 
-            var response = openAIClient.getEmbeddings(openAIEmbeddingDeployment, options);
+            var response = openAIClient.getEmbeddings(openAIEmbeddingDeployment, options).block();
 
             List<EmbeddingItem> embeddings = response.getData();
 
             return embeddings.get(0).getEmbedding().stream().toList();
         } catch (Exception ex) {
             log.error("GetEmbeddingsAsync Exception:", ex);
+            ex.printStackTrace(); //TODO
             return null;
         }
     }
@@ -94,7 +100,7 @@ public class OpenAIService {
 //            options.setNucleusSamplingFactor(0d);// TODO
 
 
-        ChatCompletions completions = openAIClient.getChatCompletions(openAICompletionDeployment, options);
+        ChatCompletions completions = openAIClient.getChatCompletions(openAICompletionDeployment, options).block();
 
         return completions.getChoices().get(0).getMessage().getContent();
 

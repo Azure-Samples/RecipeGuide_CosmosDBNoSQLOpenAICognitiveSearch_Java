@@ -25,6 +25,14 @@ public class CosmosDbService {
         CosmosDatabase database = cosmosClient.getDatabase(databaseName);
 
         this.container = database.getContainer(containerName);
+
+/*        SqlQuerySpec query = new SqlQuerySpec("SELECT * FROM c ");
+
+        CosmosPagedIterable<Recipe> pagedIterable = container.queryItems(query, new CosmosQueryRequestOptions(), Recipe.class);
+        pagedIterable.stream().forEach(i -> {
+            CosmosItemResponse<Object> objectCosmosItemResponse = container.deleteItem(i, new CosmosItemRequestOptions());
+            Object item = objectCosmosItemResponse.getItem();
+        });*/
     }
 
     public int getRecipeCount(boolean withEmbedding) {
@@ -46,9 +54,8 @@ public class CosmosDbService {
         List<CosmosItemOperation> itemOperations = recipes
                 .stream()
                 .map(recipe -> {
-                            String id = recipe.getId();
-                            if (Objects.isNull(id)) {
-                                recipe.setId(UUID.randomUUID().toString());
+                            if (Objects.isNull(recipe.getId())) {
+                                recipe.setId(recipe.getName().replace(" ", ""));
                             }
                             return CosmosBulkOperations
                                     .getCreateItemOperation(recipe,
@@ -61,7 +68,7 @@ public class CosmosDbService {
     }
 
     public List<Recipe> getRecipes(List<String> ids) {
-        String join = String.join(",", ids);
+        String join = "'" +String.join("','", ids) + "'";
         String querystring = "SELECT * FROM c WHERE c.id IN(" + join + ")";
 
         log.info(querystring);
