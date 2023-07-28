@@ -1,4 +1,4 @@
-package com.azure.recipe;
+package com.azure.recipe.model;
 
 import lombok.Data;
 

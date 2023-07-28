@@ -1,5 +1,6 @@
 package com.azure.recipe;
 
+import com.azure.recipe.model.Recipe;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
 import java.io.File;

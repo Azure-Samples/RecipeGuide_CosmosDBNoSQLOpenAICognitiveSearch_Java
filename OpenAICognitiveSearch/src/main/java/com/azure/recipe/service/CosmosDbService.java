@@ -1,8 +1,9 @@
-package com.azure.recipe;
+package com.azure.recipe.service;
 
 import com.azure.cosmos.*;
 import com.azure.cosmos.models.*;
 import com.azure.cosmos.util.CosmosPagedIterable;
+import com.azure.recipe.model.Recipe;
 import lombok.extern.slf4j.Slf4j;
 
 import java.util.*;

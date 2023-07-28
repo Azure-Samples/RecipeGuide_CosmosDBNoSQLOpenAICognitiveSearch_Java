@@ -1,4 +1,4 @@
-package com.azure.recipe;
+package com.azure.recipe.service;
 
 import com.azure.ai.openai.OpenAIAsyncClient;
 import com.azure.ai.openai.OpenAIClient;

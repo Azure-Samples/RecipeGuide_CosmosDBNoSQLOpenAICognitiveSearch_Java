@@ -1,7 +1,10 @@
-package com.azure.recipe;
+package com.azure.recipe.service;
 
 import com.azure.core.credential.AzureKeyCredential;
 import com.azure.core.util.Context;
+import com.azure.recipe.AppConfig;
+import com.azure.recipe.model.CogSearchDoc;
+import com.azure.recipe.model.Recipe;
 import com.azure.search.documents.SearchClient;
 import com.azure.search.documents.indexes.SearchIndexClient;
 import com.azure.search.documents.indexes.SearchIndexClientBuilder;
