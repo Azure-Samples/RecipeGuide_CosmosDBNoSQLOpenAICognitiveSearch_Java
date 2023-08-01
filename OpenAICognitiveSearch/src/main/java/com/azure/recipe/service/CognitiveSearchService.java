@@ -20,23 +20,21 @@ import java.util.stream.Collectors;
 
 @Slf4j
 public class CognitiveSearchService {
-    private AppConfig config;
     private static final String MY_SEMANTIC_CONFIG = "my-semantic-config";
     private String searchIndexName;
     private SearchIndexClient indexClient = null;
     private SearchClient searchClient = null;
 
 
-    public CognitiveSearchService(AppConfig config) {
-        this.config = config;
-        searchIndexName = config.getSearchIndexName();
+    public CognitiveSearchService() {
+        searchIndexName = AppConfig.searchIndexName;
         indexClient = createSearchIndexClient();
         searchClient = indexClient.getSearchClient(searchIndexName);
     }
 
     private SearchIndexClient createSearchIndexClient() {
-        String searchServiceEndPoint = config.getSearchServiceEndPoint();
-        String adminApiKey = config.getSearchServiceAdminApiKey();
+        String searchServiceEndPoint = AppConfig.searchServiceEndPoint;
+        String adminApiKey = AppConfig.searchServiceAdminApiKey;
 
         return new SearchIndexClientBuilder()
                 .endpoint(searchServiceEndPoint)
@@ -72,7 +70,7 @@ public class CognitiveSearchService {
 
         return response
                 .stream()
-                .map(result -> (String)result.getDocument(Map.class).get("id")) // TODO
+                .map(result -> (String) result.getDocument(Map.class).get("id")) // TODO
                 .collect(Collectors.toList());
     }
 
@@ -149,7 +147,8 @@ public class CognitiveSearchService {
         SearchField nameSearchField = new SearchField("name", SearchFieldDataType.STRING);
         nameSearchField.setFilterable(true);
         nameSearchField.setSortable(true);
-        nameSearchField.setSearchable(true);;
+        nameSearchField.setSearchable(true);
+        ;
 
         SearchField descSearchField = new SearchField("description", SearchFieldDataType.STRING);
         descSearchField.setFilterable(true);

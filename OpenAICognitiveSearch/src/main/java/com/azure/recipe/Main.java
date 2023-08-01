@@ -24,9 +24,8 @@ public class Main {
 
 
 
-        AppConfig config = readAppConfig();
 
-        cosmosDbService = initCosmosDbService(config);
+        cosmosDbService = initCosmosDbService();
 
         while (true) {
             System.out.println("1.\tUpload recipe(s) to Cosmos DB");
@@ -36,9 +35,9 @@ public class Main {
             System.out.print("Please select an option: ");
             int selectedOption = Integer.parseInt(scanner.nextLine());
             switch (selectedOption) {
-                case 1 -> uploadRecipes(config);
-                case 2 -> generateEmbeddings(config);
-                case 3 -> performSearch(config, scanner);
+                case 1 -> uploadRecipes();
+                case 2 -> generateEmbeddings();
+                case 3 -> performSearch(scanner);
                 default -> {
                     return;
                 }
@@ -47,11 +46,11 @@ public class Main {
         }
     }
 
-    private static CosmosDbService initCosmosDbService(AppConfig config) {
-        CosmosDbService cosmosDbService = new CosmosDbService(config.getCosmosUri(),
-                config.getCosmosKey(),
-                config.getCosmosDatabase(),
-                config.getCosmosContainer()
+    private static CosmosDbService initCosmosDbService() {
+        CosmosDbService cosmosDbService = new CosmosDbService(AppConfig.cosmosUri,
+                AppConfig.cosmosKey,
+                AppConfig.cosmosDatabase,
+                AppConfig.cosmosContainer
         );
         int recipeWithEmbedding = cosmosDbService.getRecipeCount(true);
         int recipeWithNoEmbedding = cosmosDbService.getRecipeCount(false);
@@ -62,16 +61,16 @@ public class Main {
         return cosmosDbService;
     }
 
-    private static OpenAIService initOpenAIService(AppConfig config) {
-        return new OpenAIService(config.getOpenAIEndpoint(),
-                config.getOpenAIKey(),
-                config.getOpenAIEmbeddingDeployment(),
-                config.getOpenAICompletionsDeployment(),
-                config.getOpenAIMaxToken());
+    private static OpenAIService initOpenAIService() {
+        return new OpenAIService(AppConfig.openAIEndpoint,
+                AppConfig.openAIKey,
+                AppConfig.openAIEmbeddingDeployment,
+                AppConfig.openAICompletionsDeployment,
+                AppConfig.openAIMaxToken);
     }
 
-    public static void uploadRecipes(AppConfig config) {
-        List<Recipe> recipes = Utility.parseDocuments(config.getRecipeLocalFolder());
+    public static void uploadRecipes() {
+        List<Recipe> recipes = Utility.parseDocuments(AppConfig.recipeLocalFolder);
 
         cosmosDbService.uploadRecipes(recipes);
 
@@ -82,20 +81,16 @@ public class Main {
                 recipeWithEmbedding, recipeWithNoEmbedding);
     }
 
-    private static AppConfig readAppConfig() throws IOException {
-        return new ObjectMapper().readValue(Main.class.getClassLoader().getResource("appsettings.json"), AppConfig.class);
-    }
-
-    public static void performSearch(AppConfig config, Scanner scanner) throws JsonProcessingException {
+    public static void performSearch(Scanner scanner) throws JsonProcessingException {
 
         if (openAIEmbeddingService == null) {
             log.info("Connecting to Open AI Service..");
-            openAIEmbeddingService = initOpenAIService(config);
+            openAIEmbeddingService = initOpenAIService();
         }
 
         if (cogSearchService == null) {
             log.info("Connecting to Azure Cognitive Search..");
-            cogSearchService = new CognitiveSearchService(config);
+            cogSearchService = new CognitiveSearchService();
 
             log.info("Checking for Index in Azure Cognitive Search..");
             if (!cogSearchService.checkIndexIfExists()) {
@@ -111,9 +106,9 @@ public class Main {
         var embeddingVector = openAIEmbeddingService.getEmbeddings(userQuery);
 
         log.info("Performing Vector Search..");
-        List<Float> embeddings = embeddingVector.stream().map(aDouble -> {
-            return (Float) (float) aDouble.doubleValue();
-        }).collect(Collectors.toList());
+        List<Float> embeddings = embeddingVector.stream()
+                .map(aDouble -> (Float) (float) aDouble.doubleValue())
+                .collect(Collectors.toList());
 
         var ids = cogSearchService.singleVectorSearch(embeddings);
 
@@ -140,20 +135,20 @@ public class Main {
         log.info("AI Assistant Response {}", chatCompletion);
     }
 
-    private static void generateEmbeddings(AppConfig config) throws JsonProcessingException {
+    private static void generateEmbeddings() throws JsonProcessingException {
         Map<String, List<Double>> dictEmbeddings = new HashMap<>();
         int recipeWithEmbedding = 0;
         int recipeWithNoEmbedding = 0;
         int recipeCount = 0;
 
         if (openAIEmbeddingService == null) {
-            openAIEmbeddingService = initOpenAIService(config);
+            openAIEmbeddingService = initOpenAIService();
         }
 
 
         if (cogSearchService == null) {
             log.info("Connecting to Azure Cognitive Search..");
-            cogSearchService = new CognitiveSearchService(config);
+            cogSearchService = new CognitiveSearchService();
 
             log.info("Checking for Index in Azure Cognitive Search..");
             if (!cogSearchService.checkIndexIfExists()) {

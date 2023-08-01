@@ -103,7 +103,6 @@ public class OpenAIService {
         options.setN(1);
         options.setLogitBias(new HashMap<>());
         options.setUser("");
-//            options.setNucleusSamplingFactor(0d);// TODO
 
 
         ChatCompletions completions = openAIClient.getChatCompletions(openAICompletionDeployment, options).block();
