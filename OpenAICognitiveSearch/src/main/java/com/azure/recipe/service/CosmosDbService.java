@@ -2,9 +2,12 @@ package com.azure.recipe.service;
 
 import com.azure.cosmos.*;
 import com.azure.cosmos.models.*;
+import com.azure.cosmos.util.CosmosPagedFlux;
 import com.azure.cosmos.util.CosmosPagedIterable;
 import com.azure.recipe.model.Recipe;
 import lombok.extern.slf4j.Slf4j;
+import reactor.core.publisher.Flux;
+import reactor.core.publisher.Mono;
 
 import java.util.*;
 import java.util.stream.Collectors;
@@ -12,28 +15,31 @@ import java.util.stream.Collectors;
 @Slf4j
 public class CosmosDbService {
 
-    CosmosContainer container;
+    CosmosAsyncContainer container;
 
     public CosmosDbService(String endpoint, String key, String databaseName, String containerName) {
 
-        CosmosClient cosmosClient = new CosmosClientBuilder()
+        CosmosAsyncClient cosmosAsyncClient = new CosmosClientBuilder()
                 .endpoint(endpoint)
                 .key(key)
                 .consistencyLevel(ConsistencyLevel.EVENTUAL)
                 .contentResponseOnWriteEnabled(true)
-                .buildClient();
+                .buildAsyncClient();
 
-        CosmosDatabase database = cosmosClient.getDatabase(databaseName);
+        CosmosAsyncDatabase database = cosmosAsyncClient.getDatabase(databaseName);
+
+        SqlQuerySpec query = new SqlQuerySpec("SELECT * FROM c ");
 
         this.container = database.getContainer(containerName);
 
-/*        SqlQuerySpec query = new SqlQuerySpec("SELECT * FROM c ");
+    }
 
-        CosmosPagedIterable<Recipe> pagedIterable = container.queryItems(query, new CosmosQueryRequestOptions(), Recipe.class);
-        pagedIterable.stream().forEach(i -> {
-            CosmosItemResponse<Object> objectCosmosItemResponse = container.deleteItem(i, new CosmosItemRequestOptions());
-            Object item = objectCosmosItemResponse.getItem();
-        });*/
+    private void deleteAllItems(SqlQuerySpec query) {
+        CosmosPagedFlux<Recipe> recipeCosmosPagedFlux = container.queryItems(query, new CosmosQueryRequestOptions(), Recipe.class);
+        recipeCosmosPagedFlux.flatMap(recipe -> {
+            log.info("Recipe: {}", recipe);
+            return container.deleteItem(recipe, new CosmosItemRequestOptions());
+        }).subscribe(response -> log.info("Deletion Response: {}", response));
     }
 
     public int getRecipeCount(boolean withEmbedding) {
@@ -41,14 +47,8 @@ public class CosmosDbService {
         SqlQuerySpec query = new SqlQuerySpec("SELECT value Count(c.id) FROM c WHERE IS_ARRAY(c.embedding)=@status", parameters);
 
         CosmosQueryRequestOptions options = new CosmosQueryRequestOptions();
-        CosmosPagedIterable<Integer> results = container.queryItems(query, options, Integer.class);
-        Iterator<Integer> iterator = results.iterator();
-        if (iterator.hasNext()) {
-            return iterator.next();
-        } else {
-            return 0;
-        }
-
+        List<Integer> results = container.queryItems(query, options, Integer.class).collectList().block();
+        return results.get(0);
     }
 
     public void uploadRecipes(List<Recipe> recipes) {
@@ -64,27 +64,30 @@ public class CosmosDbService {
                         }
                 ).collect(Collectors.toList());
 
-        Iterable<CosmosBulkOperationResponse<Object>> cosmosBulkOperationResponses = container.executeBulkOperations(itemOperations);
-        cosmosBulkOperationResponses.forEach(objectCosmosBulkOperationResponse -> log.info("Inserted {}", objectCosmosBulkOperationResponse));
+        Flux<CosmosBulkOperationResponse<Object>> cosmosBulkOperationResponseFlux =
+                container.executeBulkOperations(Flux.fromIterable(itemOperations));
+        cosmosBulkOperationResponseFlux.subscribe(cosmosBulkOperationResponse -> log.info("Inserted {}", cosmosBulkOperationResponse));
     }
 
     public List<Recipe> getRecipes(List<String> ids) {
-        String join = "'" +String.join("','", ids) + "'";
+        String join = "'" + String.join("','", ids) + "'";
         String querystring = "SELECT * FROM c WHERE c.id IN(" + join + ")";
 
         log.info(querystring);
 
         SqlQuerySpec query = new SqlQuerySpec(querystring);
 
-        CosmosPagedIterable<Recipe> recipes = container.queryItems(query, new CosmosQueryRequestOptions(), Recipe.class);
-        return recipes.stream().collect(Collectors.toList());
+        CosmosPagedFlux<Recipe> recipeCosmosPagedFlux = container
+                .queryItems(query, new CosmosQueryRequestOptions(), Recipe.class);
+        return recipeCosmosPagedFlux.collectList().block();
     }
 
     public List<Recipe> getRecipesToVectorize() {
         SqlQuerySpec query = new SqlQuerySpec("SELECT * FROM c WHERE IS_ARRAY(c.embedding)=false");
 
-        CosmosPagedIterable<Recipe> pagedIterable = container.queryItems(query, new CosmosQueryRequestOptions(), Recipe.class);
-        return pagedIterable.stream().collect(Collectors.toList());
+        CosmosPagedFlux<Recipe> recipeCosmosPagedFlux = container
+                .queryItems(query, new CosmosQueryRequestOptions(), Recipe.class);
+        return recipeCosmosPagedFlux.collectList().block();
     }
 
 
@@ -100,7 +103,7 @@ public class CosmosDbService {
                     );
                 })
                 .collect(Collectors.toList());
-        container.executeBulkOperations(itemOperations);
+        container.executeBulkOperations(Flux.fromIterable(itemOperations));
     }
 
 }

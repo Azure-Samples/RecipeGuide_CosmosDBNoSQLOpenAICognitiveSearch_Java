@@ -22,16 +22,18 @@ public class Main {
 
         Scanner scanner = new Scanner(System.in);
 
-        System.out.println("1.\tUpload recipe(s) to Cosmos DB");
-        System.out.println("2.\tVectorize the recipe(s) and store it in Cosmos DB");
-        System.out.println("3.\tAsk AI Assistant (search for a recipe by name or description, or ask a question)");
-        System.out.println("4.\tExit this Application");
+
 
         AppConfig config = readAppConfig();
 
         cosmosDbService = initCosmosDbService(config);
 
         while (true) {
+            System.out.println("1.\tUpload recipe(s) to Cosmos DB");
+            System.out.println("2.\tVectorize the recipe(s) and store it in Cosmos DB");
+            System.out.println("3.\tAsk AI Assistant (search for a recipe by name or description, or ask a question)");
+            System.out.println("4.\tExit this Application");
+            System.out.print("Please select an option: ");
             int selectedOption = Integer.parseInt(scanner.nextLine());
             switch (selectedOption) {
                 case 1 -> uploadRecipes(config);
