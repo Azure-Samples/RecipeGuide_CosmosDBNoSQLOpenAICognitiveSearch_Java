@@ -70,7 +70,7 @@ public class CognitiveSearchService {
 
         return response
                 .stream()
-                .map(result -> (String) result.getDocument(Map.class).get("id")) // TODO
+                .map(result -> (String) result.getDocument(Map.class).get("id"))
                 .collect(Collectors.toList());
     }
 
@@ -117,7 +117,7 @@ public class CognitiveSearchService {
         indexClient.createOrUpdateIndex(buildVectorSearchIndex(indexName));
     }
 
-    SearchIndex buildVectorSearchIndex(String name) {
+    private SearchIndex buildVectorSearchIndex(String name) {
         String vectorSearchConfigName = "my-vector-config";
 
         SearchIndex searchIndex = new SearchIndex(name);
@@ -148,7 +148,6 @@ public class CognitiveSearchService {
         nameSearchField.setFilterable(true);
         nameSearchField.setSortable(true);
         nameSearchField.setSearchable(true);
-        ;
 
         SearchField descSearchField = new SearchField("description", SearchFieldDataType.STRING);
         descSearchField.setFilterable(true);

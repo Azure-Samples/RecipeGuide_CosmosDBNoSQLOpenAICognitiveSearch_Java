@@ -56,15 +56,13 @@ public class OpenAIService {
             this.openAIClient = new OpenAIClientBuilder()
                     .endpoint(endpoint)
                     .credential(new AzureKeyCredential(key))
-                    .retryOptions(retryOptions
-                    )
+                    .retryOptions(retryOptions)
                     .buildAsyncClient();
         } else {
             this.openAIClient = new OpenAIClientBuilder()
                     .endpoint(endpoint)
                     .credential(new NonAzureOpenAIKeyCredential(key))
-                    .retryOptions(retryOptions
-                    )
+                    .retryOptions(retryOptions)
                     .buildAsyncClient();
         }
     }
@@ -81,7 +79,7 @@ public class OpenAIService {
             return embeddings.get(0).getEmbedding().stream().toList();
         } catch (Exception ex) {
             log.error("GetEmbeddingsAsync Exception:", ex);
-            ex.printStackTrace(); //TODO
+            ex.printStackTrace();
             return null;
         }
     }
