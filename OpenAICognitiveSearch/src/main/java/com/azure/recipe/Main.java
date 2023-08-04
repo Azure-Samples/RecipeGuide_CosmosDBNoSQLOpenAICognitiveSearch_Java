@@ -22,12 +22,10 @@ public class Main {
 
         Scanner scanner = new Scanner(System.in);
 
-
-
-
         cosmosDbService = initCosmosDbService();
 
         while (true) {
+            System.out.println("\n");
             System.out.println("1.\tUpload recipe(s) to Cosmos DB");
             System.out.println("2.\tVectorize the recipe(s) and store it in Cosmos DB");
             System.out.println("3.\tAsk AI Assistant (search for a recipe by name or description, or ask a question)");

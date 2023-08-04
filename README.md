@@ -1,4 +1,4 @@
-# Project Name
+# Integrate Open AI Services with Cosmos DB: RAG pattern
 
 This repository provides a demo showcasing the usage of the RAG pattern for integrating Azure Open AI services with custom data in Azure Cosmos DB. The goal is to limit the responses from Open AI services based on recipes stored in Cosmos DB.
 
