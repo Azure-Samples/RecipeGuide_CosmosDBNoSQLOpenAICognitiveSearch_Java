@@ -103,7 +103,10 @@ public class CosmosDbService {
                     );
                 })
                 .collect(Collectors.toList());
-        container.executeBulkOperations(Flux.fromIterable(itemOperations));
+        container.executeBulkOperations(Flux.fromIterable(itemOperations))
+                .subscribe(cosmosBulkOperationResponse ->
+                        log.info("Updated {}", cosmosBulkOperationResponse)
+                );
     }
 
 }
