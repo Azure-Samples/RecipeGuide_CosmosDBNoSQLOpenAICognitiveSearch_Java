@@ -26,6 +26,7 @@ To begin, follow these steps:
 1) **Upload Documents to Cosmos DB:** Select the first option in the application and hit enter. This option reads documents from the local machine and uploads the JSON files to the Cosmos DB NoSQL account.
 
 2) **Create Azure Cognitive Search Index:** 
+![img.png](img.png)
 <details>
 <summary>Click to show/hide Cognitive Search Index fields json</summary>
 
