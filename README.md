@@ -18,6 +18,29 @@ cd OpenAICognitiveSearch
 mvn compile exec:java
 ```
 
+### Run
+
+Before running the application, you need to set environment variables. Either export them in command line or set system variables:
+
+```bash
+    export COSMOS_URI="URI of your Cosmos DB account"
+    export COSMOS_KEY="KEY of your Cosmos DB account"
+    export COSMOS_DATABASE="name of a database you have created"
+    export COSMOS_CONTAINER="name of a container in above database, partitioned by id"
+    export RECIPE_LOCAL_FOLDER="the full path to the Recipe folder in this project e.g. C:CosmosDemo\OpenAICognitiveSearch\Recipe"
+    export OPENAI_ENDPOINT="endpoint for your Azure OpenAI account"
+    export OPENAI_KEY="key for your Azure OpenAI account"
+    export OPENAI_EMBEDDING_DEPLOYMENT="deployment id for your Azure OpenAI chat embeddings"
+    export OPENAI_COMPLETIONS_DEPLOYMENT="deployment is for your Azure OpenAI chat completions"
+    export SEARCH_SERVICE_ENDPOINT="Azure Cognitive Search service endpoint"
+    export SEARCH_INDEX_NAME="Choose a search index name - you will use this when creating the index"
+```
+
+Then run the app:
+
+```bash
+mvn exec:java   
+```
 
 ## Getting Started
 When you run the application for the first time, it will connect to Cosmos DB and report that there are no recipes available, as we have not uploaded any recipes yet.
@@ -26,6 +49,8 @@ To begin, follow these steps:
 1) **Upload Documents to Cosmos DB:** Select the first option in the application and hit enter. This option reads documents from the local machine and uploads the JSON files to the Cosmos DB NoSQL account.
 
 2) **Create Azure Cognitive Search Index:** 
+
+Create an index for Cosmos DB in Azure Search, and be sure to give it the same name that you set in environment variables above.
 ![img.png](img.png)
 <details>
 <summary>Click to show/hide Cognitive Search Index fields json</summary>
