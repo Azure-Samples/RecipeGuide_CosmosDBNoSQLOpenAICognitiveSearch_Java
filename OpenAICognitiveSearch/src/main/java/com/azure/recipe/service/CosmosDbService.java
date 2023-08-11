@@ -28,18 +28,17 @@ public class CosmosDbService {
 
         CosmosAsyncDatabase database = cosmosAsyncClient.getDatabase(databaseName);
 
-        SqlQuerySpec query = new SqlQuerySpec("SELECT * FROM c ");
-
         this.container = database.getContainer(containerName);
-
     }
 
-    private void deleteAllItems(SqlQuerySpec query) {
+    private void deleteAllItems() {
+        SqlQuerySpec query = new SqlQuerySpec("SELECT * FROM c ");
+
         CosmosPagedFlux<Recipe> recipeCosmosPagedFlux = container.queryItems(query, new CosmosQueryRequestOptions(), Recipe.class);
         recipeCosmosPagedFlux.flatMap(recipe -> {
             log.info("Recipe: {}", recipe);
             return container.deleteItem(recipe, new CosmosItemRequestOptions());
-        }).subscribe(response -> log.info("Deletion Response: {}", response));
+        }).blockLast();
     }
 
     public int getRecipeCount(boolean withEmbedding) {
@@ -66,7 +65,7 @@ public class CosmosDbService {
 
         Flux<CosmosBulkOperationResponse<Object>> cosmosBulkOperationResponseFlux =
                 container.executeBulkOperations(Flux.fromIterable(itemOperations));
-        cosmosBulkOperationResponseFlux.subscribe(cosmosBulkOperationResponse -> log.info("Inserted {}", cosmosBulkOperationResponse));
+        cosmosBulkOperationResponseFlux.blockLast();
     }
 
     public List<Recipe> getRecipes(List<String> ids) {
