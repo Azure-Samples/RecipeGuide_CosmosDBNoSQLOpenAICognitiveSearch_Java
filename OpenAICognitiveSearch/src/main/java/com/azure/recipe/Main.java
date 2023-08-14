@@ -53,6 +53,7 @@ public class Main {
         int recipeWithEmbedding = cosmosDbService.getRecipeCount(true);
         int recipeWithNoEmbedding = cosmosDbService.getRecipeCount(false);
 
+        System.out.println("\n");
         System.out.printf("We have %d vectorized recipe(s) and %d non vectorized recipe(s).",
                 recipeWithEmbedding, recipeWithNoEmbedding);
 
@@ -110,10 +111,10 @@ public class Main {
 
         var ids = cogSearchService.singleVectorSearch(embeddings);
 
-        log.info("Retriving recipe(s) from Cosmos DB (RAG pattern)..");
+        log.info("Retrieving recipe(s) from Cosmos DB (RAG pattern)..");
         var retrivedDocs = cosmosDbService.getRecipes(ids);
 
-        log.info("Priocessing {} to generate Chat Response  using OpenAI Service..", retrivedDocs.size());
+        log.info("Processing {} to generate Chat Response  using OpenAI Service..", retrivedDocs.size());
 
         StringBuilder retrivedReceipeNames = new StringBuilder();
 
@@ -130,7 +131,8 @@ public class Main {
 
         String chatCompletion = completion;
 
-        log.info("AI Assistant Response {}", chatCompletion);
+        log.info("AI Assistant Response:", chatCompletion);
+        System.out.println(chatCompletion);
     }
 
     private static void generateEmbeddings() throws JsonProcessingException {
@@ -177,7 +179,10 @@ public class Main {
         recipeWithEmbedding = cosmosDbService.getRecipeCount(true);
         recipeWithNoEmbedding = cosmosDbService.getRecipeCount(false);
 
-        log.info("Vectorized {}}recipe(s). We have {} vectorized recipe(s) and {} non vectorized recipe(s).", recipeCount, recipeWithEmbedding, recipeWithNoEmbedding);
+        log.info("Vectorized {} recipe(s).", recipeCount);
+        System.out.println("\n");
+        System.out.printf("We have %d vectorized recipe(s) and %d non vectorized recipe(s).",
+                recipeWithEmbedding, recipeWithNoEmbedding);
     }
 
 

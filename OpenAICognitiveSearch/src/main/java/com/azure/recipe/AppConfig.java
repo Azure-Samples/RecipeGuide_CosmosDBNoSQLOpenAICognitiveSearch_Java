@@ -46,7 +46,7 @@ public class AppConfig {
     public static int openAIMaxToken = Integer.parseInt(System.getProperty("OPENAI_MAX_TOKEN",
             StringUtils.defaultString(StringUtils.trimToNull(
                             System.getenv().get("OPENAI_MAX_TOKEN")),
-                    "64")));
+                    "1000")));
     public static String searchServiceEndPoint = System.getProperty("SEARCH_SERVICE_ENDPOINT",
             StringUtils.defaultString(StringUtils.trimToNull(
                             System.getenv().get("SEARCH_SERVICE_ENDPOINT")),
