@@ -1,12 +1,12 @@
-# Integrate Open AI Services with Cosmos DB: RAG pattern
+# Integrate OpenAI Services with Cosmos DB: RAG pattern
 
-This repository provides a demo showcasing the usage of the RAG pattern for integrating Azure Open AI services with custom data in Azure Cosmos DB. The goal is to limit the responses from Open AI services based on recipes stored in Cosmos DB.
+This repository provides a demo showcasing the usage of the RAG pattern for integrating Azure OpenAI services with custom data in Azure Cosmos DB. The goal is to limit the responses from OpenAI services based on recipes stored in Cosmos DB.
 
 ### Prerequisites
 
 - Azure Cosmos DB NoSQL Account
     - Create a DataBase and Container with 1000 RU/sec Autoscale provisioned throughput
-- Azure Open AI Service
+- Azure OpenAI Service
     - Deploy text-davinci-003 model for Embeding
     - Deploy gpt-35-turbo model for Chat Completion
 - Azure Cognitive Search Account
@@ -162,7 +162,7 @@ Create an index for Cosmos DB in Azure Search, and be sure to give it the same n
 ```
 </details>
 
-3) **Vectorize and Upload Recipes to Azure Cognitive Search:** The JSON data uploaded to Cosmos DB is not yet ready for efficient integration with Open AI. To use the RAG pattern, we need to find relevant recipes from Cosmos DB. Embeddings help us achieve this. To accomplish the task, we will utilize the vector search capability in Azure Cognitive Search to search for embeddings. Firstly, create the required vector search index in Azure Cognitive Search. Then, vectorize the recipes and upload the vectors to Azure Cognitive Search. Additionally, save them into Cosmos DB for future use. Selecting the second option in the application will perform all these activities.
+3) **Vectorize and Upload Recipes to Azure Cognitive Search:** The JSON data uploaded to Cosmos DB is not yet ready for efficient integration with OpenAI. To use the RAG pattern, we need to find relevant recipes from Cosmos DB. Embeddings help us achieve this. To accomplish the task, we will utilize the vector search capability in Azure Cognitive Search to search for embeddings. Firstly, create the required vector search index in Azure Cognitive Search. Then, vectorize the recipes and upload the vectors to Azure Cognitive Search. Additionally, save them into Cosmos DB for future use. Selecting the second option in the application will perform all these activities.
 
 
 #### Creating  a Search Index Client for Azure Cognitive Search
@@ -247,7 +247,7 @@ Create an index for Cosmos DB in Azure Search, and be sure to give it the same n
 ```
 </details>
 
-#### Initialize the Azure Open AI SDK
+#### Initialize the Azure OpenAI SDK
 <details>
 <summary>Click to show/hide</summary>
 
@@ -286,7 +286,7 @@ Create an index for Cosmos DB in Azure Search, and be sure to give it the same n
 ```   
 </details>
 
-#### Generate Embedings using Open AI Service
+#### Generate Embedings using OpenAI Service
 <details>
 <summary>Click to show/hide</summary>
 
@@ -335,7 +335,7 @@ Create an index for Cosmos DB in Azure Search, and be sure to give it the same n
 ```  
 </details>
 
-5)	**Perform Search:** The third option in the application runs the search based on the user query. The user query is converted to an embedding using the Open AI service. The embedding is then sent to Azure Cognitive Search to perform a vector search. The vector search attempts to find vectors that are close to the supplied vector and returns a list of items. We utilize the search results to retrieve the recipe documents from Cosmos DB, convert them to strings, and provide them to the Open AI service as prompts. During this process, we also include the instructions we want to provide to the Open AI service as prompt. The Open AI service processes the instructions and custom data provided as prompts to generate the response.
+5)	**Perform Search:** The third option in the application runs the search based on the user query. The user query is converted to an embedding using the OpenAI service. The embedding is then sent to Azure Cognitive Search to perform a vector search. The vector search attempts to find vectors that are close to the supplied vector and returns a list of items. We utilize the search results to retrieve the recipe documents from Cosmos DB, convert them to strings, and provide them to the OpenAI service as prompts. During this process, we also include the instructions we want to provide to the OpenAI service as prompt. The OpenAI service processes the instructions and custom data provided as prompts to generate the response.
 
 
 
@@ -386,7 +386,7 @@ Create an index for Cosmos DB in Azure Search, and be sure to give it the same n
 ```
 </details>
 
-#### Prompt Engineering to make sure Open AI service limits the response to supplied recipes
+#### Prompt Engineering to make sure OpenAI service limits the response to supplied recipes
 <details>
 <summary>Click to show/hide</summary>
 
