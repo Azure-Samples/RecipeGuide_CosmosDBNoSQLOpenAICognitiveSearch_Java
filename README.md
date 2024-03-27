@@ -1,12 +1,12 @@
 # Integrate Open AI Services with Cosmos DB: RAG pattern
 
-This repository provides a demo showcasing the usage of the RAG pattern for integrating Azure Open AI services with custom data in Azure Cosmos DB. The goal is to limit the responses from Open AI services based on recipes stored in Cosmos DB.
+This repository provides a demo showcasing the usage of the RAG pattern for integrating Azure OpenAI services with custom data in Azure Cosmos DB. The goal is to limit the responses from Open AI services based on recipes stored in Cosmos DB.
 
 ### Prerequisites
 
 - Azure Cosmos DB NoSQL Account
     - Create a DataBase and Container with 1000 RU/sec Autoscale provisioned throughput
-- Azure Open AI Service
+- Azure OpenAI Service
     - Deploy text-davinci-003 model for Embeding
     - Deploy gpt-35-turbo model for Chat Completion
 - Azure Cognitive Search Account
@@ -247,7 +247,7 @@ Create an index for Cosmos DB in Azure Search, and be sure to give it the same n
 ```
 </details>
 
-#### Initialize the Azure Open AI SDK
+#### Initialize the Azure OpenAI SDK
 <details>
 <summary>Click to show/hide</summary>
 
